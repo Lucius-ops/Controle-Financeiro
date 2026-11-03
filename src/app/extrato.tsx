@@ -1,4 +1,5 @@
 import { calcularSaldo, dataParaExibir, excluirLancamento, formatarMoeda, listarLancamentos } from "@/lib/lancamentos";
+import { cores, mono } from "@/theme";
 import { Lancamento } from "@/types/Lancamento";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -54,41 +55,46 @@ export default function Extrato() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator animating={carregando} size='large' />
+      <Text style={styles.comando}>$ tail -n {lista.length} extrato.log</Text>
+      <ActivityIndicator animating={carregando} size='large' color={cores.azul} />
 
       <FlatList
         data={lista}
         keyExtractor={(item) => item.id!}
         ListEmptyComponent={
-          carregando ? undefined : <Text style={styles.vazio}>Nenhum lançamento ainda.</Text>
+          carregando ? undefined : <Text style={styles.vazio}>Nenhum lançamento ainda. Registra o primeiro.</Text>
         }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.data}>{dataParaExibir(item.data)}</Text>
-              <Text style={styles.obs}>{item.observacao}</Text>
-              <Pressable onPress={() => confirmarExclusao(item)}>
-                <Text style={styles.excluir}>Excluir</Text>
-              </Pressable>
+        renderItem={({ item }) => {
+          const entrada = item.tipo === 'entrada';
+          const cor = entrada ? cores.verde : cores.vermelho;
+          const etiqueta = entrada ? 'ENTRADA' : 'SAIDA';
+          return (
+            <View style={styles.card}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.mono}>{dataParaExibir(item.data)} <Text style={{ color: cor }}>[{etiqueta}]</Text></Text>
+                <Text style={styles.obs}>{item.observacao}</Text>
+                <Pressable onPress={() => confirmarExclusao(item)}>
+                  <Text style={styles.excluir}>Excluir</Text>
+                </Pressable>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={[styles.valor, { color: cor }]}>{entrada ? '+' : '-'}{formatarMoeda(item.valor)}</Text>
+                <Text style={styles.mono}>saldo {formatarMoeda(item.saldoApos)}</Text>
+              </View>
             </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 18, color: item.tipo === 'entrada' ? 'green' : 'red' }}>
-                {item.tipo === 'entrada' ? '+ ' : '- '}{formatarMoeda(item.valor)}
-              </Text>
-              <Text style={styles.saldo}>Saldo {formatarMoeda(item.saldoApos)}</Text>
-            </View>
-          </View>
-        )} />
+          );
+        }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  card: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#ccc', paddingVertical: 12 },
-  data: { fontSize: 13, color: '#666' },
-  obs: { fontSize: 16 },
-  excluir: { fontSize: 13, color: '#666', textDecorationLine: 'underline', marginTop: 4 },
-  saldo: { fontSize: 13, color: '#666', marginTop: 4 },
-  vazio: { textAlign: 'center', marginTop: 32, fontSize: 16 }
+  comando: { fontFamily: mono, color: cores.verde, fontSize: 14, marginBottom: 8 },
+  card: { flexDirection: 'row', borderBottomWidth: 1, borderColor: cores.borda, paddingVertical: 12 },
+  mono: { fontFamily: mono, fontSize: 12, color: cores.muted },
+  obs: { fontSize: 15, color: cores.texto, marginTop: 2 },
+  valor: { fontFamily: mono, fontSize: 16, fontWeight: 'bold' },
+  excluir: { fontSize: 13, color: cores.muted, textDecorationLine: 'underline', marginTop: 4 },
+  vazio: { textAlign: 'center', marginTop: 32, fontSize: 16, color: cores.muted }
 });

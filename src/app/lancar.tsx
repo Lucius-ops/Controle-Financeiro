@@ -1,8 +1,11 @@
+import Botao from "@/components/Botao";
+import Campo from "@/components/Campo";
 import { dataParaISO, hojeEmTexto, inserirLancamento, valorParaNumero } from "@/lib/lancamentos";
+import { cores } from "@/theme";
 import { Lancamento } from "@/types/Lancamento";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { auth } from "../../firebaseConfig";
 
 export default function Lancar() {
@@ -61,46 +64,24 @@ export default function Lancar() {
     <View style={styles.container}>
       <View style={styles.linha}>
         <Pressable
-          style={[styles.tipo, tipo === 'entrada' && { backgroundColor: 'green' }]}
+          style={[styles.tipo, tipo === 'entrada' && { backgroundColor: cores.verde, borderColor: cores.verde }]}
           onPress={() => setTipo('entrada')}>
-          <Text style={[styles.textoTipo, tipo === 'entrada' && { color: 'white' }]}>Recebi</Text>
+          <Text style={[styles.textoTipo, tipo === 'entrada' && { color: cores.escuro }]}>Recebi</Text>
         </Pressable>
         <Pressable
-          style={[styles.tipo, tipo === 'saida' && { backgroundColor: 'red' }]}
+          style={[styles.tipo, tipo === 'saida' && { backgroundColor: cores.vermelho, borderColor: cores.vermelho }]}
           onPress={() => setTipo('saida')}>
-          <Text style={[styles.textoTipo, tipo === 'saida' && { color: 'white' }]}>Paguei</Text>
+          <Text style={[styles.textoTipo, tipo === 'saida' && { color: cores.escuro }]}>Paguei</Text>
         </Pressable>
       </View>
 
-      <Text style={styles.rotulo}>Valor (R$)</Text>
-      <TextInput
-        style={styles.input}
-        value={valor}
-        onChangeText={setValor}
-        keyboardType='decimal-pad'
-        placeholder='0,00' />
+      <Campo rotulo='Valor (R$)' value={valor} onChangeText={setValor} keyboardType='decimal-pad' placeholder='0,00' />
+      <Campo rotulo='Data' value={data} onChangeText={mudarData} keyboardType='number-pad' placeholder='DD/MM/AAAA' />
+      <Campo rotulo='Observação' value={observacao} onChangeText={setObservacao} maxLength={80} placeholder='Ex.: aluguel de novembro' />
 
-      <Text style={styles.rotulo}>Data</Text>
-      <TextInput
-        style={styles.input}
-        value={data}
-        onChangeText={mudarData}
-        keyboardType='number-pad'
-        placeholder='DD/MM/AAAA' />
+      <Botao titulo='Salvar' cor={cores.verde} onPress={salvar} disabled={carregando} />
 
-      <Text style={styles.rotulo}>Observação</Text>
-      <TextInput
-        style={styles.input}
-        value={observacao}
-        onChangeText={setObservacao}
-        maxLength={80}
-        placeholder='Ex.: aluguel de novembro' />
-
-      <Pressable style={styles.botao} onPress={salvar} disabled={carregando}>
-        <Text style={styles.textoBotao}>Salvar</Text>
-      </Pressable>
-
-      <ActivityIndicator animating={carregando} size='large' />
+      <ActivityIndicator animating={carregando} size='large' color={cores.azul} style={{ marginTop: 16 }} />
     </View>
   );
 }
@@ -108,10 +89,6 @@ export default function Lancar() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24 },
   linha: { flexDirection: 'row', gap: 12, marginBottom: 8 },
-  tipo: { flex: 1, borderWidth: 1, borderColor: '#999', borderRadius: 6, padding: 12, alignItems: 'center' },
-  textoTipo: { fontSize: 18, fontWeight: 'bold' },
-  rotulo: { fontSize: 14, marginTop: 12 },
-  input: { borderWidth: 1, borderColor: '#999', borderRadius: 6, padding: 10, fontSize: 16 },
-  botao: { backgroundColor: 'green', padding: 12, borderRadius: 6, marginVertical: 24, alignItems: 'center' },
-  textoBotao: { color: 'white', fontSize: 18 }
+  tipo: { flex: 1, borderWidth: 1, borderColor: cores.borda, borderRadius: 6, padding: 12, alignItems: 'center' },
+  textoTipo: { fontSize: 18, fontWeight: 'bold', color: cores.texto }
 });

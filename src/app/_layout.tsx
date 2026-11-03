@@ -1,3 +1,4 @@
+import { cores } from "@/theme";
 import { Stack } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -18,18 +19,21 @@ export default function RootLayout() {
 
   if (carregando) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size='large' />
+      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: cores.fundo }}>
+        <ActivityIndicator size='large' color={cores.azul} />
       </View>
     );
   }
 
   return (
-    <Stack>
+    <Stack screenOptions={{
+      headerStyle: { backgroundColor: cores.superficie },
+      headerTintColor: cores.texto,
+      contentStyle: { backgroundColor: cores.fundo }
+    }}>
       <Stack.Protected guard={!!usuario}>
         <Stack.Screen name="index" options={{ title: 'Minha conta' }} />
         <Stack.Screen name="lancar" options={{ title: 'Novo lançamento' }} />
-        <Stack.Screen name="transferir" options={{ title: 'Transferir ou pagar' }} />
         <Stack.Screen name="extrato" options={{ title: 'Extrato' }} />
       </Stack.Protected>
 
